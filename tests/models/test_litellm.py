@@ -7,9 +7,7 @@ This test uses LiteLLM with GitHub Copilot without url_base and api_key paramete
 """
 
 import asyncio
-import os
 import sys
-import subprocess
 
 try:
     from pydantic_ai import Agent
@@ -21,35 +19,6 @@ except ImportError as e:
     sys.exit(1)
 
 
-def setup_github_auth():
-    """Set up GitHub authentication for LiteLLM."""
-    print("🔧 Setting up GitHub authentication for LiteLLM...")
-    
-    try:
-        # Get GitHub token from gh CLI
-        result = subprocess.run(['gh', 'auth', 'token'], capture_output=True, text=True)
-        if result.returncode == 0:
-            token = result.stdout.strip()
-            # Set multiple environment variables that LiteLLM might expect for GitHub Copilot
-            os.environ['GITHUB_TOKEN'] = token
-            os.environ['GITHUB_API_KEY'] = token
-            os.environ['COPILOT_API_KEY'] = token  # Some versions might expect this
-            os.environ['GITHUB_COPILOT_TOKEN'] = token  # Alternative naming
-            
-            print(f"✅ GitHub token configured for LiteLLM: {token[:8]}...")
-            print("✅ Set multiple environment variable variants:")
-            print("   • GITHUB_TOKEN")
-            print("   • GITHUB_API_KEY") 
-            print("   • COPILOT_API_KEY")
-            print("   • GITHUB_COPILOT_TOKEN")
-            return True
-        else:
-            print(f"❌ Failed to get GitHub token: {result.stderr}")
-            return False
-    except Exception as e:
-        print(f"❌ Error setting up authentication: {e}")
-        return False
-
 
 def test_litellm_github_copilot_sync():
     """Test LiteLLM GitHub Copilot with synchronous call."""
@@ -58,7 +27,6 @@ def test_litellm_github_copilot_sync():
     
     try:
         # Create LiteLLM GitHub Copilot model
-        # LiteLLM will use GITHUB_TOKEN from environment for OAuth2 authentication
         model = LiteLLMModel('github_copilot/gpt-4.1')
         agent = Agent(
             model,
@@ -171,12 +139,6 @@ def main():
     """Run all LiteLLM GitHub Copilot tests."""
     print("🎯 LiteLLM GitHub Copilot API Testing with Pydantic AI")
     print("=" * 60)
-    
-    # Setup authentication first
-    if not setup_github_auth():
-        print("❌ Failed to setup GitHub authentication. Please run 'gh auth login' first.")
-        return False
-    
     print("Testing LiteLLM GitHub Copilot API calls...")
     
     results = []
@@ -216,14 +178,10 @@ def main():
         print("\n🚀 Working configuration:")
         print("   • Model: github_copilot/gpt-4.1")
         print("   • Provider: LiteLLMModel")
-        print("   • Authentication: GITHUB_TOKEN environment variable")
-        print("   • Direct LiteLLM API usage with OAuth2 support")
-        print("   • Extra headers: Editor-Version, Copilot-Integration-Id")
     else:
         print("\n⚠️  All API tests failed. Check GitHub Copilot access.")
         print("💡 Make sure you have:")
         print("   • GitHub Copilot subscription")
-        print("   • Valid GitHub authentication")
         print("   • LiteLLM installed: pip install litellm")
     
     return passed > 0
