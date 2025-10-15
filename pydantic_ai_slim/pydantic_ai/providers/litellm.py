@@ -11,6 +11,7 @@ from pydantic_ai.profiles.amazon import amazon_model_profile
 from pydantic_ai.profiles.anthropic import anthropic_model_profile
 from pydantic_ai.profiles.cohere import cohere_model_profile
 from pydantic_ai.profiles.deepseek import deepseek_model_profile
+from pydantic_ai.profiles.github import github_copilot_model_profile
 from pydantic_ai.profiles.google import google_model_profile
 from pydantic_ai.profiles.grok import grok_model_profile
 from pydantic_ai.profiles.groq import groq_model_profile
@@ -63,6 +64,7 @@ class LiteLLMProvider(Provider[AsyncOpenAI]):
             'moonshotai': moonshotai_model_profile,
             'x-ai': grok_model_profile,
             'qwen': qwen_model_profile,
+            'github_copilot': github_copilot_model_profile,
         }
 
         profile = None
