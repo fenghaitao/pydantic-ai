@@ -35,7 +35,6 @@ from ..messages import (
     UserPromptPart,
 )
 from ..profiles import ModelProfile, ModelProfileSpec
-from ..profiles.github import github_copilot_model_profile
 from ..profiles.openai import openai_model_profile
 from ..settings import ModelSettings
 from ..tools import ToolDefinition
@@ -98,10 +97,9 @@ class LiteLLMModel(Model):
         
         # Determine the appropriate profile based on model name
         if profile is None:
-            if model_name.startswith('github_copilot/'):
-                profile = github_copilot_model_profile(model_name.split('/', 1)[1])
-            else:
-                profile = openai_model_profile(model_name)
+            # Use OpenAI profile for all LiteLLM models (including github_copilot/*)
+            # We pass the raw model name; providers can adjust if needed.
+            profile = openai_model_profile(model_name.split('/', 1)[1] if '/' in model_name else model_name)
         
         super().__init__(settings=settings, profile=profile)
 
